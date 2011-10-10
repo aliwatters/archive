@@ -104,7 +104,6 @@ class MONGOBASE {
 
 	/* mbsert() allow for intelligent inserting and (or) updating */
 	public function mbsert($options = false){
-		var_dump($options);
 		$default_options = array(
             'col'	=> 'mbsert',
             'obj'   => false,
