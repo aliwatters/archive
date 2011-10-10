@@ -172,14 +172,6 @@ class MONGOBASE_DB extends MONGOBASE {
         }
 	}
 
-    private function settings($options,$defaults = array()) {
-        if (! $options === false && is_array($options))  {
-            return array_merge($default,$options);
-        }
-        return $defaults;
-    }   
-
-
 	public function delete($options = false) {
 
 		$defaults = array(
