@@ -23,7 +23,7 @@ class MONGOBASE_DB extends MONGOBASE {
 
         $options = $this->options();
 		try{
-			if ( $options['db_replicas'] === true && $options['db_user'] !=='' ) {
+			if ( $options['db_replicas'] === true && $options['db_user'] !== '' ) {
 				
                 //replica and database need authentication
 				$m = new Mongo("mongodb://{$options['db_user']}:{$options['db_pass']}@{$options['db_host']}:{$options['db_port']}/{$options['db_name']}", array('replicaSet' => true));
