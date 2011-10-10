@@ -1,0 +1,48 @@
+<?php
+
+/* THIS IS AN EXAMPLE APP */
+
+// This file is required and includes other files
+require_once(dirname(__FILE__).'/mb/mb.php');
+
+// This assigns the MONGOBASE CLASS to $mb
+$mb = mb_load();
+
+// This highlights available options
+var_dump($mb->options());
+
+/* EXAMPLE OF ADDING AN OBJECT */
+$add_object = array(
+	'obj'	=> array(
+		'key'	=> 'value'
+	)
+);
+var_dump($mb->mbsert($add_object));
+
+/* EXAMPLE OF EDITING AN OBJECT */
+$edit_object = array(
+	'obj'	=> array(
+		'key'	=> 'value2'
+	),
+	'id'	=> 'XXX' // Replace with valid ID to accomplish an edit
+);
+var_dump($mb->mbsert($edit_object));
+
+/* EXAMPLE OF FINDING AN OBJECT */
+$find_object = array(
+	'col'		=> 'mbsert',
+	'where'		=> array(),
+	'limit'		=> false,
+	'offset'	=> false,
+	'order_by'	=> false,
+	'order'		=> false,
+	'id'		=> false
+);
+var_dump($mb->find($find_object));
+
+/* EXAMPLE OF DELETING AN OBJECT */
+$delete_object = array(
+	'col'		=> 'mbsert',
+	'id'		=> '4e92712a0812faa937f8e068'
+);
+var_dump($mb->delete($delete_object));
