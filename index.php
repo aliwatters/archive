@@ -42,7 +42,7 @@ var_dump($mb->find($find_object));
 
 /* EXAMPLE OF DELETING AN OBJECT */
 $delete_object = array(
-	'col'		=> 'mbsert',
-	'id'		=> '4e92712a0812faa937f8e068'
+	'col'	=> 'mbsert',
+	'id'	=> 'XXX' // Replace with valid ID to accomplish an edit
 );
 var_dump($mb->delete($delete_object));
