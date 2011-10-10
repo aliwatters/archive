@@ -9,13 +9,26 @@ class MONGOBASE {
 
     function __construct(){
         $this -> options();
+
+        // Subclasses should call this with parent::__construct();
     }
+
+
+    public function settings($options,$defaults = array()) {
+        if (! $options === false && is_array($options))  {
+            return array_merge($default,$options);
+        }
+        return $defaults;
+    }   
+
+
+
     
-    function get_option($key) {
+    public function get_option($key) {
         return $this -> options[$key];
     }
 
-    function set_option($key,$val) {
+    public function set_option($key,$val) {
         $this->options[$key] = $val;
         return $val;
     }
