@@ -1,18 +1,31 @@
 <?php
 
-class MONGOBASE {
+class MONGOBASE_DB extends MONGOBASE {
 
-	private function mongo(){
+    public $dbh;
+    private $mongo;
+    public $error;
+    private $is_connected = false;
+    
+    function __construct(){
+        parent::__construct();
+
+        $this->is_connected = $this->connect(); // probably not to use here but on the queries
+    }
+
+	private function connect(){
 		/*
 		For authentication and security, mongodb need to execute/run with --auth parameter
 		Reference: http://www.mongodb.org/display/DOCS/Security+and+Authentication
 		*/
+
+        if (is_object($this->dbh)) return $this->dbh;
+
+        $options = $this->options();
 		try{
-			$mb = mb_load();
-			$options = $mb->options();
-			if(isset($GLOBALS['_mb_cache']['mongo'])) return $GLOBALS['_mb_cache']['mongo'];
-			if ($options['db_replicas'] === true && $options['db_user'] !==''){
-				//replica and database need authentication
+			if ( $options['db_replicas'] === true && $options['db_user'] !=='' ) {
+				
+                //replica and database need authentication
 				$m = new Mongo("mongodb://{$options['db_user']}:{$options['db_pass']}@{$options['db_host']}:{$options['db_port']}/{$options['db_name']}", array('replicaSet' => true));
 			} elseif ($options['db_replicas'] === true) {
 				//replica set and no auth.
@@ -26,33 +39,25 @@ class MONGOBASE {
 				$m = new Mongo("mongodb://{$options['db_host']}:{$options['db_port']}/{$options['db_name']}");
 
 			}
-			$GLOBALS['_mb_cache']['mongo'] = $m;
-			return $m;
+            $this->mongo = $m;
+            $this->dbh = $m->db;
+			return true;
 		} catch (MongoConnectionException $e) {
-            return(__('Error connecting to MongoDB server'));
+            $this -> error = $this->__('Error connecting to MongoDB server');
         } catch (MongoException $e) {
-            return(__('Error: ').$e->getMessage());
+            $this -> error = $this->__('Error: mongoDB error').$e->getMessage();
         } catch (MongoCursorException $e) {
-            return(__('Error: probably username password in config').$e->getMessage());
+            $this -> error = $this->__('Error: probably username password in config').$e->getMessage();
+        } catch (Exception $e) {
+            $this -> error = $this->__('Error: ').$e->getMessage();
         }
+        
+        return false;
 	}
 
-	private function register_configuration_setting($definition = false, $constant = false, $default = null){
-		if($default===null) $default = $constant;
-		if(($definition)&&($constant)){
-			if(defined($definition)){ $this_setting = $constant; }else{ $this_setting = $default; }
-			return $this_setting;
-		}else{
-			if($definition){
-				if(defined($definition)){ $this_setting = $default; }
-				return $this_setting;
-			}else{
-				return $default;
-			}
-		}
-	}
 
 	private function arrayed($these_objs){
+    /* takes mongo_db objects and returns them as arrays for php */
         if(is_object($these_objs)){
             $objects = array();
             foreach($these_objs as $this_obj) {
@@ -71,39 +76,36 @@ class MONGOBASE {
 	
 	public function options(){
 
-        /* IF GOT OPTIONS IN CACHE, RETURN THEM */
-		if(isset($GLOBALS['_mb_cache']['mb_options'])){
-            return $GLOBALS['_mb_cache']['mb_options'];
-        }else{
+        if (isset($this->options) && ! empty($this->options)) return $this->options;
+    
+        /* ELSE - GATHER CONFIG SETTINGS */
+		if(!defined('MONGODB_NAME')) define('MONGODB_NAME', 'mongobase');
+		$this->register_configuration_setting('db_name','MONGODB_NAME', MONGODB_NAME);
 
-            /* ELSE - GATHER CONFIG SETTINGS */
-			if(!defined('MONGODB_NAME')) define('MONGODB_NAME', 'mongobase');
-			$mb_options['db_name'] = $this->register_configuration_setting('MONGODB_NAME', MONGODB_NAME);
+		if(!defined('MONGODB_HOST')) define('MONGODB_HOST', 'localhost');
+		$this->register_configuration_setting('db_host','MONGODB_HOST', MONGODB_HOST);
 
-			if(!defined('MONGODB_HOST')) define('MONGODB_HOST', 'localhost');
-			$mb_options['db_host'] = $this->register_configuration_setting('MONGODB_HOST', MONGODB_HOST);
+		if(!defined('MONGODB_USERNAME')) define('MONGODB_USERNAME', false);
+		$this->register_configuration_setting('db_user','MONGODB_USERNAME', MONGODB_USERNAME);
 
-			if(!defined('MONGODB_USERNAME')) define('MONGODB_USERNAME', false);
-			$mb_options['db_user'] = $this->register_configuration_setting('MONGODB_USERNAME', MONGODB_USERNAME);
+		if(!defined('MONGODB_PASSWORD')) define('MONGODB_PASSWORD', false);
+		$this->register_configuration_setting('db_pass','MONGODB_PASSWORD', MONGODB_PASSWORD);
 
-			if(!defined('MONGODB_PASSWORD')) define('MONGODB_PASSWORD', false);
-			$mb_options['db_pass'] = $this->register_configuration_setting('MONGODB_PASSWORD', MONGODB_PASSWORD);
+		if(!defined('MONGODB_PORT')) define('MONGODB_PORT', '27017');
+		$this->register_configuration_setting('db_port','MONGODB_PORT', MONGODB_PORT);
 
-			if(!defined('MONGODB_PORT')) define('MONGODB_PORT', '27017');
-			$mb_options['db_port'] = $this->register_configuration_setting('MONGODB_PORT', MONGODB_PORT);
-
-			if(!defined('MONGODB_REPLICAS')) define('MONGODB_REPLICAS', false);
-			$mb_options['db_replicas'] = $this->register_configuration_setting('MONGODB_REPLICAS', MONGODB_REPLICAS);
+		if(!defined('MONGODB_REPLICAS')) define('MONGODB_REPLICAS', false);
+		$this->register_configuration_setting('db_replicas','MONGODB_REPLICAS', MONGODB_REPLICAS);
 			
-			/* STORE AND RETURN OPTIONS */
-            $GLOBALS['_mb_cache']['mb_options'] = $mb_options;
-            return $mb_options;
-
-        }
+        return $this->options;
+        
     }
+
 
 	/* mbsert() allow for intelligent inserting and (or) updating */
 	public function mbsert($options = false){
+
+        /* why are we overriding options here?? */
 		$default_options = array(
             'col'	=> 'mbsert',
             'obj'   => false,
@@ -115,34 +117,29 @@ class MONGOBASE {
             $settings = $default_options;
         }
 
+        if (! $this->is_connected) $this->connect();
+        $dbh = $this->dbh; 
+
 		try{
 
-			/* GOT OBJECT */
-			$m = $this->mongo();
-			$options = $this->options();
-			$db = $m->$options['db_name'];
-			$collection = $db->$settings['col'];
+			$collection = $dbh->$settings['col'];
 			$mongo_id = new MongoID($settings['id']);
 			$key = array("_id"=>$mongo_id);
 			$data = $settings['obj'];
-			$results = $db->command( array(
+			$results = $dbh->command( array(
 				'findAndModify' => $settings['col'],
 				'query' => $key,
 				'update' => $data,
 				'new' => true,
 				'upsert' => true,
-				'fields' => array( '_id' => 1 )
+				'fields' => array( '_id' => 1 ) // mongoDB returns these values
 			) );
 			return $results['value']['_id'];
 
-		} catch (MongoConnectionException $e) {
-            return(__('Error connecting to MongoDB server'));
-        } catch (MongoException $e) {
-            return(__('Error: ').$e->getMessage());
-        } catch (MongoCursorException $e) {
-            return(__('Error: probably username password in config').$e->getMessage());
+		} catch (Exception $e) {
+            // should be able to do this class wide on the base object
+            return $this->__('Error: ').$e->getMessage();
         }
-
 	}
 
 	public function find($options = false){
@@ -155,32 +152,35 @@ class MONGOBASE {
 			'order'		=> false,
 			'id'		=> false
         );
+
         if(is_array($options)){
             $settings = array_merge($default_options,$options);
         }else{
             $settings = $default_options;
-        } if($settings['order_by']){
-			if($settings['order']!='desc'){ $order_value=1; }else{ $order_value=-1; }
+        } 
+        
+        if($settings['order_by']){
+            if ($settings['order']!='desc') $order_value=1; else $order_value=-1; 
 			$sort_clause = array($order_by=>$order_value);
-		}else{ $sort_clause = array(); }
+		} else {    
+            $sort_clause = array(); 
+        }
+
+        if (! $this->is_connected) $this->connect();
+        $dbh = $this->dbh;
 
 		try{
 
-			$m = $this->mongo();
-			$options = $this->options();
-			$db = $m->$options['db_name'];
-			$collection = $db->$settings['col'];
+			$collection = $dbh->$settings['col'];
+
 			$results = $this->arrayed($collection->find($settings['where'])->sort($sort_clause)->skip($settings['offset'])->limit($settings['limit']));
 			return $results;
 
-		} catch (MongoConnectionException $e) {
-            return(__('Error connecting to MongoDB server'));
-        } catch (MongoException $e) {
-            return(__('Error: ').$e->getMessage());
-        } catch (MongoCursorException $e) {
-            return(__('Error: probably username password in config').$e->getMessage());
+        } catch (Exception $e) {
+            return $this->__('Error: ').$e->getMessage();
         }
 	}
+
 
 	public function delete($options = false){
 		$default_options = array(
@@ -193,24 +193,22 @@ class MONGOBASE {
             $settings = $default_options;
         }
 
+        if (! $this->is_connected) $this->connect();
+        $dbh = $this->dbh;
+
+
 		try{
 
-			$m = $this->mongo();
-			$options = $this->options();
-			$db = $m->$options['db_name'];
-			$collection = $db->$settings['col'];
+			$collection = $dbh->$settings['col'];
+
 			$criteria = array(
 				'_id' => new MongoId($settings['id']),
 			);
 			$progress = $collection->remove($criteria,array('safe'=>true));
 			return $progress['n'];
 
-		} catch (MongoConnectionException $e) {
-            return(__('Error connecting to MongoDB server'));
-        } catch (MongoException $e) {
-            return(__('Error: ').$e->getMessage());
-        } catch (MongoCursorException $e) {
-            return(__('Error: probably username password in config').$e->getMessage());
+		} catch (Exception $e) {
+            return $this->__('Error: ').get_class($e).' : '.$e->getMessage();
         }
 	}
 
