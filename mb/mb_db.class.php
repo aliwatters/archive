@@ -105,18 +105,13 @@ class MONGOBASE_DB extends MONGOBASE {
 	/* mbsert() allow for intelligent inserting and (or) updating */
 	public function mbsert($options = false){
 
-        /* why are we overriding options here?? */
-		$default_options = array(
+		$defaults = array(
             'col'	=> 'mbsert',
             'obj'   => false,
 			'id'	=> false
         );
-        if(is_array($options)){
-            $settings = array_merge($default_options,$options);
-        }else{
-            $settings = $default_options;
-        }
 
+        $settings = $this->settings($options,$defaults);
         if (! $this->is_connected) $this->connect();
         $dbh = $this->dbh; 
 
@@ -143,7 +138,7 @@ class MONGOBASE_DB extends MONGOBASE {
 	}
 
 	public function find($options = false){
-		$default_options = array(
+		$defaults = array(
             'col'		=> 'mbsert',
             'where'		=> array(),
 			'limit'		=> false,
@@ -153,11 +148,7 @@ class MONGOBASE_DB extends MONGOBASE {
 			'id'		=> false
         );
 
-        if(is_array($options)){
-            $settings = array_merge($default_options,$options);
-        }else{
-            $settings = $default_options;
-        } 
+        $settings = $this->settings($options,$defaults);
         
         if($settings['order_by']){
             if ($settings['order']!='desc') $order_value=1; else $order_value=-1; 
@@ -181,17 +172,22 @@ class MONGOBASE_DB extends MONGOBASE {
         }
 	}
 
+    private function settings($options,$defaults = array()) {
+        if (! $options === false && is_array($options))  {
+            return array_merge($default,$options);
+        }
+        return $defaults;
+    }   
 
-	public function delete($options = false){
-		$default_options = array(
+
+	public function delete($options = false) {
+
+		$defaults = array(
             'col'		=> 'mbsert',
 			'id'		=> false
         );
-        if(is_array($options)){
-            $settings = array_merge($default_options,$options);
-        }else{
-            $settings = $default_options;
-        }
+
+        $settings = $this->settings($options,$defaults);
 
         if (! $this->is_connected) $this->connect();
         $dbh = $this->dbh;
