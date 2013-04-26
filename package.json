@@ -5,6 +5,7 @@
 	"private": false,
 	"author": "Ali Watters: http://github.com/aliwatters",
 	"description": "A simple control-flow library for Node that offers parallel, serial and limited methods, brings back errors",
+	"keywords" : ["flow","control","simple","parallel","series","limited"],
 	"homepage": "http://github.com/aliwatters/simple-flow",
 	"repository": {
 		"type": "git",
