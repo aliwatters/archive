@@ -8,7 +8,8 @@
 	"homepage": "http://github.com/aliwatters/simple-flow",
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/aliwatters/simple-flow.git",
+		"url": "git://github.com/aliwatters/simple-flow.git"
+	},
 	"engines": {
 		"node": ">=0.8.0"
 	},
