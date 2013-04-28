@@ -1,5 +1,4 @@
-var SF = require('./lib/simple-flow.js');
-var sf = new SF;
+var sf = require('../lib/simple-flow.js');
 var fs = require('fs');
 
 

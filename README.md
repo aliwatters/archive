@@ -9,12 +9,12 @@ Initially based on examples presented in http://book.mixu.net/ -- read this, gre
 ## Usage: See the examples directory for more.
 
 ```javascript
-var SF = require('./lib/simple-flow.js');
-var sf = new SF;
+var sf = require('./lib/simple-flow.js');
 
-
-
-
+// General use
+sf.series([callbacks], final);
+sf.parallel([callbacks], final);
+sf.limited(limit, [callbacks], final);
 ```
 
 ## Series method
