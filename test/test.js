@@ -1,4 +1,4 @@
-var assert = require("assert"), SF = require("../lib/simple-flow.js"), sf = new SF();
+var assert = require("assert"), sf = require("../lib/simple-flow.js");
 
 
 describe('Simple Flow', function() {
