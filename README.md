@@ -12,10 +12,20 @@ Initially based on examples presented in http://book.mixu.net/ -- read this, gre
 var sf = require('./lib/simple-flow.js');
 
 // General use
-sf.series([callbacks], final);
-sf.parallel([callbacks], final);
-sf.limited(limit, [callbacks], final);
+sf.series([callbacks], final-function);
+sf.parallel([callbacks], final-function);
+sf.limited(limit, [callbacks], final-function);
 ```
+
+### Named Callbacks
+
+Give you the ability to name callbacks for use in the final function
+
+```javascript
+sf.series({'func1':function() {},'func2':function() {}}, final-function);
+```
+
+
 
 ## Series method
 
@@ -46,6 +56,17 @@ sf.series([
 	console.log('Series 2 errors',errors);
 	console.log('Series 2 results',results);
 });
+
+// Named Series
+
+sf.series({
+	"data-1" : function(cb) { fs.readFile('data-1.txt','utf8', function(err, txt) { cb(err, txt);}) },
+	"data-x" : function(cb) { fs.readFile('data-x.txt','utf8', function(err, txt) { cb(null, txt);}) },
+	"data-2" : function(cb) { fs.readFile('data-2.txt','utf8', function(err, txt) { cb(err, txt);}) }
+}, function(errors, results) {
+	console.log('Series 2 errors',errors);
+	console.log('Series 2 results',results);
+});
 ```
 
 ## Parallel operations
@@ -69,6 +90,18 @@ sf.parallel([
 	console.log('Parallel errors:',errors);
 	console.log('Parallel errors:',results);
 });
+
+// Named Parallel
+
+sf.parallel({
+	"data-1" : function(cb) { fs.readFile('data-1.txt','utf8', function(err, txt) { cb(err, txt);}) },
+	"data-x" : function(cb) { fs.readFile('data-x.txt','utf8', function(err, txt) { cb(err, txt);}) },
+	"data-2" : function(cb) { fs.readFile('data-2.txt','utf8', function(err, txt) { cb(err, txt);}) }
+}, function(errors, results) {
+	console.log('Series 2 errors',errors);
+	console.log('Series 2 results',results);
+});
+
 ```
 
 
