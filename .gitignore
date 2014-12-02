@@ -1,0 +1,19 @@
+/node_modules
+/dist
+/conf/hash.json
+/build/*
+
+# artifacts
+.DS_Store
+.svn
+*~
+*.swp
+*.rbc
+
+# sublime config
+*.sublime-project
+*.sublime-workspace
+
+# logs
+npm-debug.log
+newrelic_agent.log
