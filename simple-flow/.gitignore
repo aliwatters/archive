@@ -1,0 +1,10 @@
+### vim ###
+.*.s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+### node.js ###
+node_modules
+npm-debug.log

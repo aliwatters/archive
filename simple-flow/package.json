@@ -1,0 +1,22 @@
+{
+	"name": "simple-flow",
+	"version": "0.0.3",
+	"main" : "lib/simple-flow",
+	"private": false,
+	"author": "Ali Watters: http://github.com/aliwatters",
+	"description": "A simple control-flow library for Node that offers parallel, serial and limited methods, brings back errors",
+	"keywords" : ["flow","control","simple","parallel","series","limited"],
+	"homepage": "http://github.com/aliwatters/simple-flow",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/aliwatters/simple-flow.git"
+	},
+	"engines": {
+		"node": ">=0.8.0"
+	},
+	"directories": {
+		"example": "examples",
+		"test": "test"
+	},	
+	"license": "LGPL"
+}
