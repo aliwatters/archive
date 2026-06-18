@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e # any error exit
+
+# TODO: use git diff to pipe an array of changed files to lint/jscs - speeds things up dramatically on large projects
+npm run lint
+npm run jscs
+
+exit 0 # everything ok - no error

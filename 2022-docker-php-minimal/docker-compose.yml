@@ -1,0 +1,52 @@
+version: "3.4"
+services:
+  load-balancer:
+    # note: development only image
+    build:
+      context: .
+      dockerfile: ./load-balancer/Dockerfile
+    ports:
+      - "443:443"
+      - "80:80"
+    links:
+      - web
+
+  web:
+    build:
+      context: .
+      dockerfile: ./web/Dockerfile
+    volumes:
+      - ./src:/app
+    links:
+      - php
+
+  php:
+    build:
+      context: .
+      dockerfile: ./php/Dockerfile
+    environment:
+      - APP_DB_SERVER=mysql
+      - APP_DB_NAME=app-db
+      - APP_DB_USER=app-user
+      - APP_DB_PASSWORD=password
+      - APP_ENV=development
+      - PHP_OPCACHE_VALIDATE_TIMESTAMPS=1
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./src:/app
+    links:
+      - mysql
+    stdin_open: true
+
+  mysql:
+    build:
+      context: .
+      dockerfile: ./mysql/Dockerfile
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=app-db
+      - MYSQL_USER=app-user
+      - MYSQL_PASSWORD=password

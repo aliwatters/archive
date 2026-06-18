@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  main:
+    container_name: hello-service
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+    build:
+      context: .
+    volumes:
+      - .:/usr/src/hello-service
+      - /usr/src/hello-service/node_modules
+    ports:
+      - '${SERVER_PORT}:${SERVER_PORT}'
+    command: npm run start
+    networks:
+      - webnet
+networks:
+  webnet:

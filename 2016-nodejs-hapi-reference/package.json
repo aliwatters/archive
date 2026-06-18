@@ -1,0 +1,34 @@
+{
+  "name": "nodejs-hapi-hello",
+  "version": "1.0.0",
+  "description": "Skeleton repo for hapijs based projects, includes; .editorconfig, .eslint etc",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "nodejs-reference-repo"
+  },
+  "author": "Ali Watters",
+  "license": "ISC",
+  "devDependencies": {
+    "confidence": "^3.0.1",
+    "eslint": "^3.3.0",
+    "eslint-config-aliwatters": "git+ssh://git@github.com/aliwatters/eslint-config-aliwatters.git",
+    "eslint-html-reporter": "^0.5.2",
+    "eslint-plugin-import": "^1.13.0",
+    "gulp": "^3.9.1",
+    "gulp-diff": "^1.0.0",
+    "gulp-eslint": "^3.0.1",
+    "gulp-jsbeautifier": "^2.0.3"
+  },
+  "scripts": {
+    "install": "./misc/install.sh",
+    "lint": "gulp lint",
+    "beautify": "gulp beautify"
+  },
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "hapi": "^14.1.0",
+    "lodash": "^4.15.0",
+    "moment": "^2.14.1"
+  }
+}
